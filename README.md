@@ -2,32 +2,38 @@
 
 SoccerIQ is a React + TypeScript scouting and analytics app ("Moneyball Platform") built with Vite.
 
-## Why the 404 happened on GitHub
-GitHub repository pages (`github.com/<user>/<repo>/tree/...`) do **not** render Vite apps.
-Your app must be deployed to **GitHub Pages** and loaded from:
+## Waarom je nu `GET /src/main.tsx 404` ziet
+Die fout betekent dat GitHub Pages nu je **bronbestanden** serveert (raw `index.html`) in plaats van de gebouwde `dist/` output.
 
-`https://<user>.github.io/<repo>/`
+Een Vite-app werkt op GitHub alleen correct als je de **gebouwde assets** publiceert.
 
-## Run locally
+## Juiste GitHub Pages setup (belangrijk)
+1. Ga naar **Settings → Pages**.
+2. Zet **Build and deployment → Source** op **GitHub Actions**.
+3. Push naar `main` (of run handmatig de workflow).
+4. Open daarna de URL uit de workflow output (`github-pages` environment).
+
+Als Source op branch/folder staat (bijv. `main`/root), dan krijg je precies de fout uit je screenshot.
+
+## Run lokaal
 ```bash
 npm install
 npm run dev
 ```
 
-## Build locally
+## Build lokaal
 ```bash
 npm run build
 npm run preview
 ```
 
-## Deploy to GitHub Pages
-This repo includes `.github/workflows/deploy-pages.yml`.
+## GitHub Pages workflow
+Deze repo bevat `.github/workflows/deploy-pages.yml` die:
+- dependencies installeert,
+- `npm run build` uitvoert,
+- `dist` uploadt,
+- en deployt naar GitHub Pages.
 
-1. Push to `main`.
-2. In GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Wait for the `Deploy SoccerIQ to GitHub Pages` workflow.
-4. Open the Pages URL from workflow output.
-
-## SPA routing on Pages
-This project copies `dist/index.html` to `dist/404.html` after build (`postbuild`).
-That enables refresh/deep-link support for React Router routes like `/players/:id` on GitHub Pages.
+## SPA routing op Pages
+Na build kopieert `postbuild` automatisch `dist/index.html` naar `dist/404.html`.
+Daardoor werken refresh/deeplinks voor React Router routes zoals `/players/:id` op GitHub Pages.
