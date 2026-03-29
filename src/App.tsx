@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AppLayout } from '@/layouts/AppLayout';
@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <AppLayout />,
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
       { path: 'manuals', element: <ManualsPage /> },
     ],
   },
-], { basename: import.meta.env.BASE_URL });
+]);
 
 export default function App() {
   return (
