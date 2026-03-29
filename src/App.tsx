@@ -43,7 +43,7 @@ const router = createBrowserRouter([
       { path: 'manuals', element: <ManualsPage /> },
     ],
   },
-]);
+], { basename: import.meta.env.BASE_URL });
 
 export default function App() {
   return (
