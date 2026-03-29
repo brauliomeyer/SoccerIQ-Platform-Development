@@ -43,10 +43,6 @@ function mutate(mutator: (db: DB) => void) {
   saveDB(db);
 }
 
-function collectionAs<T>(db: DB, key: keyof DB): T[] {
-  return db[key] as unknown as T[];
-}
-
 const delay = (ms = 120) => new Promise((res) => setTimeout(res, ms));
 
 export function logAction(entity: string, action: 'create' | 'update' | 'delete', entity_id: string, changes: Record<string, unknown>) {
@@ -57,12 +53,12 @@ export function logAction(entity: string, action: 'create' | 'update' | 'delete'
 
 async function list<T>(key: keyof DB): Promise<T[]> {
   await delay();
-  return clone(collectionAs<T>(loadDB(), key));
+  return clone(loadDB()[key] as T[]);
 }
 
 async function getOne<T extends { id: string }>(key: keyof DB, id: string): Promise<T | undefined> {
   await delay();
-  const row = collectionAs<T>(loadDB(), key).find((item) => item.id === id);
+  const row = (loadDB()[key] as T[]).find((item) => item.id === id);
   return row ? clone(row) : undefined;
 }
 
@@ -70,7 +66,7 @@ async function createOne<T extends { id: string }>(key: keyof DB, payload: Omit<
   await delay();
   const item = { id: uid(), ...payload } as T;
   mutate((db) => {
-    collectionAs<T>(db, key).push(item);
+    (db[key] as T[]).push(item);
   });
   logAction(key, 'create', item.id, item as Record<string, unknown>);
   return clone(item);
@@ -80,12 +76,11 @@ async function updateOne<T extends { id: string }>(key: keyof DB, id: string, pa
   await delay();
   let updated!: T;
   mutate((db) => {
-    const records = collectionAs<T>(db, key);
-    const index = records.findIndex((item) => item.id === id);
+    const index = (db[key] as T[]).findIndex((item) => item.id === id);
     if (index < 0) throw new Error(`No record for ${id}`);
-    const original = records[index];
+    const original = (db[key] as T[])[index];
     updated = { ...original, ...payload };
-    records[index] = updated;
+    (db[key] as T[])[index] = updated;
   });
   logAction(key, 'update', id, payload as Record<string, unknown>);
   return clone(updated);
@@ -94,8 +89,7 @@ async function updateOne<T extends { id: string }>(key: keyof DB, id: string, pa
 async function deleteOne<T extends { id: string }>(key: keyof DB, id: string): Promise<void> {
   await delay();
   mutate((db) => {
-    const filtered = collectionAs<T>(db, key).filter((item) => item.id !== id);
-    db[key] = filtered as unknown as DB[typeof key];
+    db[key] = (db[key] as T[]).filter((item) => item.id !== id) as DB[typeof key];
   });
   logAction(key, 'delete', id, {});
 }
