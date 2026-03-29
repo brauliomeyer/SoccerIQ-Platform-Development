@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postbuild": "cp dist/index.html dist/404.html"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
